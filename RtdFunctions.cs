@@ -115,6 +115,23 @@ namespace QuoteRtd
                         item = "11";
                         break;
                 }
+            // public fund
+            else if (Regex.Match(name, "^of[0-9]{6}$").Success)
+                switch (item)
+                {
+                    case "name":
+                        item = "0";
+                        break;
+                    case "latest":
+                        item = "1";
+                        break;
+                    case "date":
+                        item = "5";
+                        break;
+                    case "close":
+                        item = "3";
+                        break;
+                }
 
             return XlCall.RTD("QuoteRtd.QuoteServer", null, name, item);
         }
