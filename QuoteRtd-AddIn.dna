@@ -16,5 +16,22 @@
        Excel-DNA also allows the xml for ribbon UI extensions to be specified in the .dna file.
        See the main Excel-DNA site at http://excel-dna.net for downloads of the full distribution.
   -->
+  <CustomUI>
+    <!-- Inside here is the exact RibbonX xml passed to Excel -->
+    <!-- This will only be loaded for Excel 2010 because of the namespace -->
+    <customUI xmlns='http://schemas.microsoft.com/office/2009/07/customui' loadImage='LoadImage'>
+      <ribbon>
+        <tabs>
+          <tab id='CustomTab' label='行情'>
+            <group id='SampleGroup' label='行情选项'>
+              <checkBox id="AutoUpdate" label="自动更新" getPressed="Checkbox_getPressed" onAction="Checkbox_onAction"/>
+              <checkBox id="Debug" label="Debug" getPressed="Checkbox_getPressed" onAction="Checkbox_onAction"/>
+              <editBox id="Interval" label="更新间隔" getText="Editbox_getText" onChange="Editbox_onChange"/>
+            </group >
+          </tab>
+        </tabs>
+      </ribbon>
+    </customUI>
+  </CustomUI>
 
 </DnaLibrary>

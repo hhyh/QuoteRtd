@@ -5,8 +5,7 @@ using System.Text.RegularExpressions;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using System.Net;
-using System.Diagnostics;
-using ExcelDna.Integration;
+
 using ExcelDna.Integration.Rtd;
 using ExcelDna.Logging;
 
@@ -21,6 +20,9 @@ namespace QuoteRtd
         private IRTDUpdateEvent m_callback;
         private Timer m_timer;
         private WebClient m_webClient;
+
+        // Script will be loaded when creating the ScriptLoader
+        private ScriptLoader m_scriptLoader = new ScriptLoader();
 
         #region IRtdServer Members
 
@@ -94,7 +96,7 @@ namespace QuoteRtd
             m_webClient = new WebClient();
             m_timer = new Timer();
             m_timer.Tick += Callback;
-            m_timer.Interval = 2000;
+            m_timer.Interval = GlobalConfig.refreshInterval;
             m_timer.Start();
 
             return 1;
@@ -114,6 +116,11 @@ namespace QuoteRtd
         //======================================================
         private void Callback(object sender, EventArgs e)
         {
+            if (!GlobalConfig.refreshData)
+                return;
+
+            // Stop the timer to prevent re-enter
+            m_timer.Stop();
 
             lock (m_topics)
             {
@@ -149,6 +156,10 @@ namespace QuoteRtd
             }
 
             m_callback.UpdateNotify();
+
+            // Restart the timer
+            m_timer.Interval = GlobalConfig.refreshInterval;
+            m_timer.Start();
         }
 
         //===================================================
@@ -165,12 +176,14 @@ namespace QuoteRtd
             }
             // Remove the last ','
             url.Remove(url.Length - 1, 1);
-            Debug.Print(url.ToString());
+            if (GlobalConfig.logEnable)
+                LogDisplay.WriteLine(url.ToString());
 
             // Submit request
             m_webClient.Encoding = Encoding.Default;
             string result = m_webClient.DownloadString(url.ToString());
-            Debug.Print(result);
+            if (GlobalConfig.logEnable)
+                LogDisplay.WriteLine(result);
 
             // Parse the result
             string[] lines = result.Split('\n');
@@ -206,7 +219,7 @@ namespace QuoteRtd
     }
 
     //========================================
-    // Topic represents a RTD call in Excel
+    // Topic represents an RTD cell in Excel
     //========================================
     public class Topic
     {
@@ -216,7 +229,7 @@ namespace QuoteRtd
         private string m_Value;     // m_Value the quote value
         private bool m_bUpdated;    // If the topic value has changed
 
-        // Attribute operations
+        // Attributes
         public string Id
         {
             get { return m_ID; }

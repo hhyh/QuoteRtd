@@ -6,20 +6,19 @@ using Microsoft.Office.Interop.Excel;
 
 namespace QuoteRtd
 {
-    class ExcelMacros : IExcelAddIn
+    class ScriptLoader
     {
-        public void AutoClose()
+        public ScriptLoader()
         {
-        }
-
-        public void AutoOpen()
-        {
+            // Register the event
             Application app = ExcelDnaUtil.Application as Application;
             app.SheetCalculate += new AppEvents_SheetCalculateEventHandler(SheetCalc);
         }
 
         private void SheetCalc(object sh)
         {
+            // When formular is recaculated, change the cell color for pecentages.
+            // Red for positive pecentage, green for negative pecentage
             Worksheet sheet = sh as Worksheet;
             foreach (Range r in sheet.UsedRange)
             {
