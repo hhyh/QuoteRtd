@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using System.Runtime.InteropServices;
 using System.Windows.Forms;
 using System.Net;
+using System.Xml;
 
 using ExcelDna.Integration.Rtd;
 using ExcelDna.Logging;
@@ -20,6 +21,8 @@ namespace QuoteRtd
         private IRTDUpdateEvent m_callback;
         private Timer m_timer;
         private WebClient m_webClient;
+        private XmlDocument m_xml;
+        private bool m_saveXml = false;
 
         // Script will be loaded when creating the ScriptLoader
         private ScriptLoader m_scriptLoader = new ScriptLoader();
@@ -33,7 +36,7 @@ namespace QuoteRtd
              * The first is the quotation id, such as sh000300...
              * The second is the item of the quotation, such as "close", "volume"
              */
-            if (Strings.Length != 2)
+            if (Strings.Length != 3)
             {
                 throw new Exception("Invalid topic parameters");
             }
@@ -43,15 +46,35 @@ namespace QuoteRtd
             {
                 throw new Exception("Invalid quotation ID");
             }
-            string item = Strings.GetValue(1) as string;
+            string idx = Strings.GetValue(1) as string;
+            string item = Strings.GetValue(2) as string;
+            if (idx == null || idx.Length == 0)
+            {
+                throw new Exception("Invalid idx");
+            }
             if (item == null || item.Length == 0)
             {
-                throw new Exception("Invalid item");
+                throw new Exception("Invalid item name");
             }
 
-            m_topics.Add(topicId, new Topic(id, item));
+            m_topics.Add(topicId, new Topic(id, idx, item));
 
-            return "Queued";
+            // Load saved data from xml
+            XmlElement rootNode = m_xml.DocumentElement;
+            XmlElement idNode = rootNode.SelectSingleNode("/data/"+id) as XmlElement;
+            if (idNode == null)
+            {
+                idNode = m_xml.CreateElement(id);
+                rootNode.AppendChild(idNode);
+            }
+            XmlElement itemNode = idNode.SelectSingleNode(item) as XmlElement;
+            if (itemNode == null)
+            {
+                itemNode = m_xml.CreateElement(item);
+                itemNode.InnerText = "Queued";
+                idNode.AppendChild(itemNode);
+            }
+            return itemNode.InnerText;
         }
 
         public void DisconnectData(int topicID)
@@ -94,6 +117,19 @@ namespace QuoteRtd
             m_topics = new Dictionary<int, Topic>();
             m_callback = CallbackObject;
             m_webClient = new WebClient();
+
+            // Load stored data
+            m_xml = new XmlDocument();
+            try
+            {
+                m_xml.Load("data.xml");
+            }
+            catch (Exception e)
+            {
+                m_xml.LoadXml("<data></data>");
+            }
+
+            // Create timer
             m_timer = new Timer();
             m_timer.Tick += Callback;
             m_timer.Interval = GlobalConfig.refreshInterval;
@@ -104,6 +140,8 @@ namespace QuoteRtd
 
         public void ServerTerminate()
         {
+            if (m_saveXml)
+                m_xml.Save("data.xml");
             m_timer.Dispose();
             m_topics = null;
         }
@@ -209,8 +247,14 @@ namespace QuoteRtd
                         if (t.Id == match.Groups[1].Value)
                         {
                             // Update value
-                            int idx = Int32.Parse(t.Item);
+                            int idx = Int32.Parse(t.Idx);
                             t.Value = items[idx];
+
+                            // Save the data in XML
+                            XmlElement node = m_xml.DocumentElement.
+                                SelectSingleNode("/data/" + t.Id + "/" + t.Item) as XmlElement;
+                            node.InnerText = t.Value;
+                            m_saveXml = true;
                         }
                     }
                 }
@@ -224,8 +268,8 @@ namespace QuoteRtd
     public class Topic
     {
         private string m_ID;    // m_ID is the quote id, such as "sh000001"
-        private string m_Item;  // m_Item is a quote item, currently it only supports integer
-                                // e.g. "1" means the second quote item (0-based index)
+        private string m_Idx;   // m_Idx is the index of the quote item
+        private string m_Item;  // m_Item is the name of quote item, such as "name", "open"
         private string m_Value;     // m_Value the quote value
         private bool m_bUpdated;    // If the topic value has changed
 
@@ -234,6 +278,11 @@ namespace QuoteRtd
         {
             get { return m_ID; }
             set { m_ID = value; }
+        }
+        public string Idx
+        {
+            get { return m_Idx; }
+            set { m_Idx = value; }
         }
         public string Item
         {
@@ -263,9 +312,10 @@ namespace QuoteRtd
         }
 
         // Constructor
-        public Topic(string Id, string Item)
+        public Topic(string Id, string Idx, string Item)
         {
             m_ID = Id;
+            m_Idx = Idx;
             m_Item = Item;
             m_Value = "";
         }

@@ -12,40 +12,41 @@ namespace QuoteRtd
         public static object Quote(string name, string item)
         {
             // Map the item name to item index
+            string idx = "0";
 
             // China security
             if (Regex.Match(name, "^s[hz][0-9]{6}$").Success)
                 switch(item)
                 {
                     case "name":
-                        item = "0";
+                        idx = "0";
                         break;
                     case "latest":
-                        item = "3";
+                        idx = "3";
                         break;
                     case "date":
-                        item = "30";
+                        idx = "30";
                         break;
                     case "time":
-                        item = "31";
+                        idx = "31";
                         break;
                     case "high":
-                        item = "4";
+                        idx = "4";
                         break;
                     case "low":
-                        item = "5";
+                        idx = "5";
                         break;
                     case "open":
-                        item = "1";
+                        idx = "1";
                         break;
                     case "close":
-                        item = "2";
+                        idx = "2";
                         break;
                     case "volume":
-                        item = "8";
+                        idx = "8";
                         break;
                     case "amount":
-                        item = "9";
+                        idx = "9";
                         break;
                 }
             // US security
@@ -53,31 +54,31 @@ namespace QuoteRtd
                 switch (item)
                 {
                     case "name":
-                        item = "0";
+                        idx = "0";
                         break;
                     case "latest":
-                        item = "1";
+                        idx = "1";
                         break;
                     case "date":
-                        item = "3";
+                        idx = "3";
                         break;
                     case "time":
-                        item = "25";
+                        idx = "25";
                         break;
                     case "high":
-                        item = "6";
+                        idx = "6";
                         break;
                     case "low":
-                        item = "7";
+                        idx = "7";
                         break;
                     case "open":
-                        item = "5";
+                        idx = "5";
                         break;
                     case "close":
-                        item = "26";
+                        idx = "26";
                         break;
                     case "volume":
-                        item = "10";
+                        idx = "10";
                         break;
                 }
             // HongKong security
@@ -85,34 +86,34 @@ namespace QuoteRtd
                 switch (item)
                 {
                     case "name":
-                        item = "1";
+                        idx = "1";
                         break;
                     case "latest":
-                        item = "6";
+                        idx = "6";
                         break;
                     case "date":
-                        item = "17";
+                        idx = "17";
                         break;
                     case "time":
-                        item = "18";
+                        idx = "18";
                         break;
                     case "high":
-                        item = "4";
+                        idx = "4";
                         break;
                     case "low":
-                        item = "5";
+                        idx = "5";
                         break;
                     case "open":
-                        item = "2";
+                        idx = "2";
                         break;
                     case "close":
-                        item = "3";
+                        idx = "3";
                         break;
                     case "volume":
-                        item = "12";
+                        idx = "12";
                         break;
                     case "amount":
-                        item = "11";
+                        idx = "11";
                         break;
                 }
             // public fund
@@ -120,20 +121,20 @@ namespace QuoteRtd
                 switch (item)
                 {
                     case "name":
-                        item = "0";
+                        idx = "0";
                         break;
                     case "latest":
-                        item = "1";
+                        idx = "1";
                         break;
                     case "date":
-                        item = "5";
+                        idx = "5";
                         break;
                     case "close":
-                        item = "3";
+                        idx = "3";
                         break;
                 }
 
-            return XlCall.RTD("QuoteRtd.QuoteServer", null, name, item);
+            return XlCall.RTD("QuoteRtd.QuoteServer", null, name, idx, item);
         }
     }
 }
