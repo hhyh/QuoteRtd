@@ -82,7 +82,8 @@ namespace QuoteRtd
                         break;
                 }
             // HongKong security
-            else if (Regex.Match(name, "^hk[0-9]{5}$").Success)
+            else if (Regex.Match(name, "^hk[0-9]{5}$").Success ||
+                     Regex.Match(name, "^hk\\w+$").Success)
                 switch (item)
                 {
                     case "name":
@@ -127,6 +128,35 @@ namespace QuoteRtd
                         idx = "1";
                         break;
                     case "date":
+                        idx = "5";
+                        break;
+                    case "close":
+                        idx = "3";
+                        break;
+                }
+            // forex
+            else if (Regex.Match(name, "^fx_\\w+$").Success)
+                switch (item)
+                {
+                    case "name":
+                        idx = "9";
+                        break;
+                    case "latest":
+                        idx = "1";
+                        break;
+                    case "date":
+                        idx = "17";
+                        break;
+                    case "time":
+                        idx = "0";
+                        break;
+                    case "high":
+                        idx = "6";
+                        break;
+                    case "low":
+                        idx = "7";
+                        break;
+                    case "open":
                         idx = "5";
                         break;
                     case "close":
