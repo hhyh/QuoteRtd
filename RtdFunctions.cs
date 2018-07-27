@@ -163,6 +163,35 @@ namespace QuoteRtd
                         idx = "3";
                         break;
                 }
+            // China stock future
+            else if (Regex.Match(name, "^nf_I[CHF][0-9]{4}$").Success)
+                switch (item)
+                {
+                    case "name":
+                        idx = "49";
+                        break;
+                    case "latest":
+                        idx = "3";
+                        break;
+                    case "date":
+                        idx = "36";
+                        break;
+                    case "time":
+                        idx = "37";
+                        break;
+                    case "high":
+                        idx = "1";
+                        break;
+                    case "low":
+                        idx = "2";
+                        break;
+                    case "open":
+                        idx = "0";
+                        break;
+                    case "close":
+                        idx = "13";
+                        break;
+                }
 
             return XlCall.RTD("QuoteRtd.QuoteServer", null, name, idx, item);
         }
