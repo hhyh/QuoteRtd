@@ -219,6 +219,7 @@ namespace QuoteRtd
 
             // Submit request
             m_webClient.Encoding = Encoding.Default;
+            m_webClient.Headers["Referer"] = "https://finance.sina.com.cn/";
             string result = m_webClient.DownloadString(url.ToString());
             if (GlobalConfig.logEnable)
                 LogDisplay.WriteLine(result);
