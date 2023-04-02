@@ -164,7 +164,7 @@ namespace QuoteRtd
                         break;
                 }
             // China stock future
-            else if (Regex.Match(name, "^nf_I[CHF][0-9]{4}$").Success)
+            else if (Regex.Match(name, "^nf_I[CHFM][0-9]{4}$").Success)
                 switch (item)
                 {
                     case "name":
@@ -190,6 +190,34 @@ namespace QuoteRtd
                         break;
                     case "close":
                         idx = "13";
+                        break;
+                }
+            else if (Regex.Match(name, "^CON_OP_[0-9]{8}$").Success)
+                switch (item)
+                {
+                    case "name":
+                        idx = "37";
+                        break;
+                    case "latest":
+                        idx = "2";
+                        break;
+                    case "date":
+                        idx = "32";
+                        break;
+                    case "time":
+                        idx = "32";
+                        break;
+                    case "high":
+                        idx = "39";
+                        break;
+                    case "low":
+                        idx = "40";
+                        break;
+                    case "open":
+                        idx = "9";
+                        break;
+                    case "close":
+                        idx = "8";
                         break;
                 }
 
