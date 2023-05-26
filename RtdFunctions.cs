@@ -48,6 +48,12 @@ namespace QuoteRtd
                     case "amount":
                         idx = "9";
                         break;
+                    case "ask":
+                        idx = "7";
+                        break;
+                    case "bid":
+                        idx = "6";
+                        break;
                 }
             // US security
             else if (Regex.Match(name, "^gb_\\w+$").Success)
@@ -219,9 +225,28 @@ namespace QuoteRtd
                     case "close":
                         idx = "8";
                         break;
+                    case "ask":
+                        idx = "3";
+                        break;
+                    case "bid":
+                        idx = "1";
+                        break;
                 }
 
             return XlCall.RTD("QuoteRtd.QuoteServer", null, name, idx, item);
+        }
+        [ExcelFunction(Name = "OptTimeValue")]
+        public static double OptTimeValue(string name, double optPrice, double optStrike, double secPrice)
+        {
+            if (name.Contains("购"))
+            {
+                return optPrice - (secPrice > optStrike ? secPrice - optStrike : 0);
+            }
+            else if (name.Contains("沽"))
+            {
+                return optPrice - (optStrike > secPrice  ? optStrike - secPrice : 0);
+            }
+            else return 0;
         }
     }
 }
