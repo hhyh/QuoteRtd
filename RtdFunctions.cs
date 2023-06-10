@@ -231,6 +231,9 @@ namespace QuoteRtd
                     case "bid":
                         idx = "1";
                         break;
+                    case "strike":
+                        idx = "7";
+                        break;
                 }
 
             return XlCall.RTD("QuoteRtd.QuoteServer", null, name, idx, item);
